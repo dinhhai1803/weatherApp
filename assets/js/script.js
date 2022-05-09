@@ -1,69 +1,89 @@
-const selectTag = document.querySelectorAll('select')
-const translateBtn = document.querySelector('button')
-const fromText = document.querySelector('.from-text')
-const toText = document.querySelector('.to-text')
-const exchangeIcon = document.querySelector('.exchange')
-const icons = document.querySelectorAll('.row i')
+const wrapper = document.querySelector('.wrapper')
+const inputPart = wrapper.querySelector('.input-part')
+const infoTxt = inputPart.querySelector('.info-txt')
+const inputFeild = inputPart.querySelector('input')
+const locationBtn = inputPart.querySelector('button')
+const wIcon = document.querySelector('.weather-part img')
+const arrowBack = wrapper.querySelector('header i')
 
-selectTag.forEach( (tag, id) => {
-    for (const country_code in countries) {
-        let selected
+let api
 
-        if(id == 0 && country_code == 'en-GB') {
-            selected = 'selected'
-        }
-        else if(id == 1 && country_code == 'hi-IN') {
-            selected = 'selected'
-        }
-
-        let option = `<option value="${country_code}" ${selected}>${countries[country_code]}</option>`
-        tag.insertAdjacentHTML("beforeend", option)
+inputFeild.addEventListener('keyup', (e) => {
+    if(e.key == 'Enter' && inputFeild.value != ''){
+        requestApi(inputFeild.value)
     }
 })
 
-exchangeIcon.addEventListener('click', () => {
-    let tempText = fromText.value
-    let tempLang = selectTag[0].value
-    fromText.value = toText.value
-    selectTag[0].value = selectTag[1].value
-    toText.value = tempText
-    selectTag[1].value = tempLang
+locationBtn.addEventListener('click', () => {
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(onSuccess, onError)
+    }
+    else{
+        alert('Your browser not support geolocation api')
+    }
 })
 
-translateBtn.addEventListener("click", () => {
-    let text = fromText.value
-    const translateFrom = selectTag[0].value
-    const translateTo = selectTag[1].value
-    if(!text) return
-    toText.setAttribute('placeholder', 'Translating ...')
-    let apiUrl = `https://api.mymemory.translated.net/get?q=${text}&langpair=${translateFrom}|${translateTo}`
-    fetch(apiUrl).then(res => res.json()).then(data => {
-        toText.value = data.responseData.translatedText
-        toText.setAttribute('placeholder', 'Translation')
-    })
+function onSuccess(position) {
+    const {latitude, longitude} = position.coords
+    let api = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=4bdcbf377f89489da098289bfb658b0b`
+    fetchData()
+}
+
+function onError(error) {
+    infoTxt.innerText = error.message
+    infoTxt.classList.add('error')
+}
+
+function requestApi(city) {
+    api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=4bdcbf377f89489da098289bfb658b0b`
+   fetchData()
+}
+
+function fetchData() {
+    infoTxt.innerText = "Getting weather details ..."
+    infoTxt.classList.add('pending')
+    fetch(api).then(response => response.json()).then(result => weatherDetails(result))
+}
+
+function  weatherDetails(info) {
+    if(info.cod == '404'){
+        infoTxt.classList.replace('pending', 'error')
+        infoTxt.innerText = `${inputFeild.value} isn't a valid city name`
+    }
+    else {
+
+        const city = info.name
+        const country = info.sys.country
+        const {description, id} = info.weather[0]
+        const {feels_like, humidity, temp} = info.main
+
+        if(id == 800){
+            wIcon.src = '../../assets/img/Weather Icons/clear.svg'
+        }else if(id >= 200 && id <= 232){
+            wIcon.src = '../../assets/img/Weather Icons/storm.svg'
+        }else if(id >= 600 && id <= 622){
+            wIcon.src = '../../assets/img/Weather Icons/snow.svg'
+        }else if(id >= 701 && id <= 781){
+            wIcon.src = '../../assets/img/Weather Icons/haze.svg'
+        }else if(id >= 801 && id <= 804){
+            wIcon.src = '../../assets/img/Weather Icons/cloud.svg'
+        }else if((id >= 300 && id <= 321) || (id >= 500 && id <= 531)){
+            wIcon.src = '../../assets/img/Weather Icons/rain.svg'
+        }
+
+        wrapper.querySelector('.temp .numb').innerText = Math.floor(temp)
+        wrapper.querySelector('.weather').innerText = description
+        wrapper.querySelector('.location span').innerText = `${city}, ${country}`
+        wrapper.querySelector('.temp .numb-2').innerText = Math.floor(feels_like)
+        wrapper.querySelector('.humidity span').innerText = `${humidity}%`
+
+        
+        infoTxt.classList.remove('pending', 'error')
+        wrapper.classList.add('active')
+    }
+}
+
+arrowBack.addEventListener('click', () => {
+    wrapper.classList.remove('active')
 })
 
-icons.forEach(icon => {
-    icon.addEventListener("click", ({target}) => {
-        if(target.classList.contains('fa-copy')) {
-            if(target.id == 'from') {
-                navigator.clipboard.writeText(fromText.value)
-            }
-            else{
-                navigator.clipboard.writeText(toText.value)
-            }
-        }
-        else{
-            let utterance
-            if(target.id == 'from') {
-                utterance = new SpeechSynthesisUtterance(fromText.value)
-                utterance.lang = selectTag[0].value
-            }
-            else{
-                utterance = new SpeechSynthesisUtterance(toText.value)
-                utterance.lang = selectTag[1].value
-            }
-            speechSynthesis.speak(utterance)
-        }
-    })
-})

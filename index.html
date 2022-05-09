@@ -4,47 +4,57 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translator App</title>
+    <title>Weather App</title>
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="./assets/fontawesome-free-6.0.0-web/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="wrapper">
-            <div class="text-input">
-                <textarea class="from-text" placeholder="Enter text"></textarea>
-                <textarea class="to-text" placeholder="Translation" readonly disabled></textarea>
-            </div>
-            <div class="controls">
-                <li class="row from">
-                    <div class="icons">
-                        <i id="from" class="fa-solid fa-volume-high"></i>
-                        <i id="from" class="fa-solid fa-copy"></i>
-                    </div>
-                    <select>
-                        
-                    </select>
-                </li>
-                <li class="exchange">
-                    <i class="fas fa-exchange-alt"></i>
-                </li>
-                <li class="row to">
-                    <select >
-                        
-                    </select>
-                    <div class="icons">
-                        <i id="to" class="fa-solid fa-volume-high"></i>
-                        <i id="to" class="fa-solid fa-copy"></i>
-                    </div>
-                </li>
-            </div>
-        </div>
 
-        <button>Translation text</button>
+    <div class="wrapper">
+        <header>
+            <i class="fa-solid fa-arrow-left"></i>
+            Weather App
+        </header>
+        <section class="input-part">
+            <p class="info-txt"></p>
+            <input type="text" placeholder="Enter city name" spellcheck="false" required>
+            <div class="separator"></div>
+            <button>Get Device Location</button>
+        </section>
+        <section class="weather-part">
+            <img src="./assets/img/Weather Icons/cloud.svg" alt="">
+            <div class="temp">
+                <span class="numb">_</span>
+                <span class="deg">°</span>C
+            </div>
+            <div class="weather">_ _</div>
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>_ _, _ _</span>
+            </div>
+            <div class="bottom-details">
+                <div class="column feels">
+                    <i class="fa-solid fa-temperature-half"></i>
+                    <div class="details">
+                        <div class="temp">
+                            <span class="numb-2">_</span>
+                            <span class="deg">°</span>C
+                        </div>
+                        <p>Feel like</p>
+                    </div>
+                </div>
+                <div class="column humidity">
+                    <i class="fa-solid fa-droplet"></i>
+                    <div class="details">
+                        <span>_</span>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <script src="./assets/js/countries.js"></script>
     <script src="./assets/js/script.js"></script>
 </body>
 </html>
